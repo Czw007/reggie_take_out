@@ -26,7 +26,7 @@ public class LoginCheckFilter implements Filter {
 
         // 1 获取本次请求的URI
         String requestURI = request.getRequestURI();
-        log.info("拦截到请求{}", requestURI);
+//        log.info("拦截到请求{}", requestURI);
         // 定义不需要处理的请求路径
         String[] urls = new String[]{
                 "/employee/login",
@@ -40,18 +40,19 @@ public class LoginCheckFilter implements Filter {
 
         // 3 如果不需要处理，则直接放行
         if (check) {
-            log.info("本次请求{}不需要处理", requestURI);
+//            log.info("本次请求{}不需要处理", requestURI);
             filterChain.doFilter(request, response);
             return;
         }
         // 4 判断登陆状态， 如果已登陆，则直接放行
         if (request.getSession().getAttribute("employee") != null) {
+//            log.info("用户已登陆，用户id为{}",request.getSession().getAttribute("employee"));
             filterChain.doFilter(request, response);
             return;
         }
+        log.info("用户未登录");
         // 5 如果未登陆则返回未登陆结果
         response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
-        return;
 
     }
 
@@ -62,7 +63,7 @@ public class LoginCheckFilter implements Filter {
      * @param requestURI
      * @return
      */
-    public Boolean check(String[] urls, String requestURI) {
+    public boolean check(String[] urls, String requestURI) {
         for (String url : urls) {
             // 把浏览器发过来的请求和我们定义的不拦截的url做比较，匹配则放行
             boolean match = PATH_MATCHER.match(url, requestURI);
