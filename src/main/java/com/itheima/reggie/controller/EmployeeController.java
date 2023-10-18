@@ -69,6 +69,7 @@ public class EmployeeController {
         return R.success("退出成功");
     }
 
+    // @RequestBody注解用于将HTTP请求体中的json或xml数据映射为Employee对象的实例
     @PostMapping
     public R<String> save(HttpServletRequest request, @RequestBody Employee employee){
         log.info("新增员工，员工信息：{}",employee.toString());
@@ -117,4 +118,31 @@ public class EmployeeController {
 
     }
 
+    /**
+     * 根据id修改员工信息
+     * @param request
+     * @param employee
+     * @return
+     */
+    @PutMapping
+    public R<String> update(HttpServletRequest request, @RequestBody Employee employee){
+        //        log.info(employee.toString());
+
+        // 获得当前登陆用户的id
+        Long empId= (Long) request.getSession().getAttribute("employee");
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(empId);
+        employeeService.updateById(employee);
+        return R.success("员工信息修改成功");
+    }
+
+    @GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable Long id){
+        Employee employee=employeeService.getById(id);
+        if (employee!=null){
+            return R.success(employee);
+        }
+
+        return R.error("没有对应员工的信息");
+    }
 }
