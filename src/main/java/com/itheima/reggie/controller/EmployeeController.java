@@ -78,14 +78,14 @@ public class EmployeeController {
         String password="123456";
         password=DigestUtils.md5DigestAsHex(password.getBytes());
         employee.setPassword(password);
-
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+//
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
 
         // 获得当前登陆用户的id
-        Long empId= (Long) request.getSession().getAttribute("employee");
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
+//        Long empId= (Long) request.getSession().getAttribute("employee");
+//        employee.setCreateUser(empId);
+//        employee.setUpdateUser(empId);
         // 新增用户的id由雪花算法自动生成
         employeeService.save(employee);
         return R.success("新增员工成功");
@@ -129,9 +129,9 @@ public class EmployeeController {
         //        log.info(employee.toString());
 
         // 获得当前登陆用户的id
-        Long empId= (Long) request.getSession().getAttribute("employee");
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(empId);
+//        Long empId= (Long) request.getSession().getAttribute("employee");
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(empId);
         employeeService.updateById(employee);
         return R.success("员工信息修改成功");
     }
