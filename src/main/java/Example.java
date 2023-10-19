@@ -1,4 +1,6 @@
 public class Example {
+
+    // 使用java实现读取
 //    String str = new String("good");
     String str="good";
     char[] ch = { 'a', 'b', 'c' };
