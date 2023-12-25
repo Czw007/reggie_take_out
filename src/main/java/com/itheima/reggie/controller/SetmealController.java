@@ -110,6 +110,27 @@ public class SetmealController {
     }
 
 
+    /**
+     * 根据条件查询套餐
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Setmeal setmeal){
+        LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
+        // 添加过滤条件，like表示模糊查询
+        queryWrapper.like(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId());
+        queryWrapper.like(setmeal.getStatus()!=null,Setmeal::getStatus,setmeal.getStatus());
+        // 添加排序条件
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+
+        List<Setmeal> list=setmealService.list(queryWrapper);
+
+        return R.success(list);
+    }
+
+
+
 
 
 }

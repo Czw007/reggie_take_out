@@ -45,7 +45,7 @@ public class UserController {
             log.info("code={}", code);
             // 需要将生成的验证码保存到Session
             session.setAttribute(phone, code);
-            return R.success("手机验证码短信发送成功");
+            return R.success("手机验证码短信发送成功："+code);
         }
         return R.error("手机验证码短信发送失败");
     }
@@ -66,10 +66,10 @@ public class UserController {
 
         // 从Session中获取保存的验证码
 //        String code_session=session.getAttribute("code").toString();
-        Object code_session=session.getAttribute(phone);
+        Object codeSession=session.getAttribute(phone);
 
         // 进行验证码的对比（页面提交的验证码和Session中保存的验证码对比
-        if(code_session!=null && code_session.equals(code)){
+        if(codeSession!=null && codeSession.equals(code)){
             // 如果对比成功，说明登录成功
 
             // 判断当前手机号对应的用户是否为新用户，如果是新用户就自动完成注册
