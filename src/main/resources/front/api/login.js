@@ -13,7 +13,7 @@ function loginApi(data) {
         data
     }).then(response => {
         // 请求成功时打印日志
-        alert('请求成功:', response);
+        alert(response.data);
         return response; // 返回响应数据，以便后续处理
     }).catch(error => {
         // 在这里处理错误
