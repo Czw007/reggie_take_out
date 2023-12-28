@@ -22,3 +22,4 @@ mybatis-plus:
 
 reggie:
   path: /Users/changzw/Documents/JAVA/reggie_pic/
+#  path: src/main/resources/backend/images/reggie_pic
