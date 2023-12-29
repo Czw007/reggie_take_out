@@ -22,4 +22,5 @@ mybatis-plus:
 
 reggie:
   path: /Users/changzw/Documents/JAVA/reggie_pic/
+#  path: src/main/resources/backend/images/reggie_pic
   # 如果在服务器上部署 可以把路径改为 /usr/local/image,然后需要把本地的图片也上传到服务器对应的路径
