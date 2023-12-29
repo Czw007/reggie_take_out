@@ -41,6 +41,7 @@ public class LoginCheckFilter implements Filter {
                 "/webjars/**",
                 "/swagger-resources/**",
                 "/v2/**"
+
         };
 
         // 2 判断本次请求是否需要处理
