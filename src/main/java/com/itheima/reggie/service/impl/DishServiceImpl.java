@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +28,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Autowired
     private DishFlavorService dishFlavorService;
+
+    @Autowired
+    private MyThreadPool myThreadPool;
     /**
      *  新增菜品，同时保存对应的口味数据
      * @param dishDto
@@ -55,17 +59,19 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      * @return
      */
     @Override
-    public DishDto getByIdWithFlavor(Long id){
+    public DishDto getByIdWithFlavor(Long id) throws ExecutionException, InterruptedException {
         DishDto dishDto=new DishDto();
         Dish dish=this.getById(id);
-        MyThreadPool myThreadPool= (MyThreadPool) MyThreadPool.createThreadPool();
-
+        // 任务1
+        // 需要返回值使用supplyAsync，不需要返回值可以使用runAsync
         CompletableFuture<String> future1= CompletableFuture.supplyAsync(()->{
             // 查询菜品基本信息，从dish表查询
             BeanUtils.copyProperties(dish,dishDto);
             return "获取菜品信息成功";
         },myThreadPool);
 
+        // 任务2
+        // 如果任务2需要依赖任务1的返回结果，可以使用thenAccptedAsync
         CompletableFuture<String> future2=CompletableFuture.supplyAsync(()->{
             // 查询当前菜品对应的口味信息，从dish_flavor表查询
             LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
@@ -75,14 +81,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             return "获取口味信息成功";
         },myThreadPool);
 
-        // 使用anyOf合并为一个新的CompletableFuture
-        CompletableFuture<Object> future3=CompletableFuture.anyOf(future1,future2);
-        // 返回dishDto
-        future3.thenAccept((info)->{
-                    System.out.println("info:"+info);
-        }
+        // 等待所有的任务都完成
+        CompletableFuture.anyOf(future1,future2).get();
 
-        );
+        // 返回dishDto
         return dishDto;
 
     }
