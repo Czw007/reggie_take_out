@@ -12,6 +12,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -31,7 +32,7 @@ public class EmployeeController {
      * 6、登录成功，将员工id存入Session并返回登录成功结果
      */
     @PostMapping("/login")
-    public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee){
+    public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee, HttpSession session){
 
         // 1、将页面提交的密码password进行md5加密处理
         String password=employee.getPassword();
@@ -58,7 +59,13 @@ public class EmployeeController {
         }
 
         // 6、登录成功，将员工id存入Session并返回登录成功结果
-        request.getSession().setAttribute("employee",emp.getId());
+        // 设置Session属性
+//        HttpSession session = request.getSession();
+        session.setAttribute("employee", emp.getId());
+
+        System.out.println("Session ID: " + session.getId());
+        System.out.println("Employee ID stored in Session: " + session.getAttribute("employee"));
+
         return R.success(emp);
     }
 

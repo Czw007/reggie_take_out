@@ -3,12 +3,14 @@ package com.itheima.reggie.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.common.R;
+import com.itheima.reggie.config.MyThreadPool;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Dish;
 import com.itheima.reggie.entity.DishFlavor;
 import com.itheima.reggie.mapper.DishMapper;
 import com.itheima.reggie.service.DishFlavorService;
 import com.itheima.reggie.service.DishService;
+import com.sun.xml.internal.ws.util.CompletedFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,19 +56,35 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      */
     @Override
     public DishDto getByIdWithFlavor(Long id){
-        // 查询菜品基本信息，从dish表查询
-        Dish dish=this.getById(id);
-
         DishDto dishDto=new DishDto();
-        BeanUtils.copyProperties(dish,dishDto);
+        Dish dish=this.getById(id);
+        MyThreadPool myThreadPool= (MyThreadPool) MyThreadPool.createThreadPool();
 
-        // 查询当前菜品对应的口味信息，从dish_flavor表查询
-        LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(DishFlavor::getDishId,dish.getId());
-        List<DishFlavor> flavors=dishFlavorService.list(queryWrapper);
-        dishDto.setFlavors(flavors);
+        CompletableFuture<String> future1= CompletableFuture.supplyAsync(()->{
+            // 查询菜品基本信息，从dish表查询
+            BeanUtils.copyProperties(dish,dishDto);
+            return "获取菜品信息成功";
+        },myThreadPool);
 
+        CompletableFuture<String> future2=CompletableFuture.supplyAsync(()->{
+            // 查询当前菜品对应的口味信息，从dish_flavor表查询
+            LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
+            queryWrapper.eq(DishFlavor::getDishId,dish.getId());
+            List<DishFlavor> flavors=dishFlavorService.list(queryWrapper);
+            dishDto.setFlavors(flavors);
+            return "获取口味信息成功";
+        },myThreadPool);
+
+        // 使用anyOf合并为一个新的CompletableFuture
+        CompletableFuture<Object> future3=CompletableFuture.anyOf(future1,future2);
+        // 返回dishDto
+        future3.thenAccept((info)->{
+                    System.out.println("info:"+info);
+        }
+
+        );
         return dishDto;
+
     }
 
     @Override
